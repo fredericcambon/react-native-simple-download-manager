@@ -46,12 +46,10 @@ public class Downloader {
             request.addRequestHeader(key, headers.getString(key));
         }
 
-        
-
-        if(external){
+        if (external) {
             request.setDestinationInExternalPublicDir(external_path, saveAsName);
 
-        }else{
+        } else {
             request.setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, saveAsName);
 
         }
@@ -94,7 +92,6 @@ public class Downloader {
         return downloadManager.remove(downloadId);
     }
 
-
     private HashMap<String, String> getDownloadStatus(Cursor cursor, long downloadId) {
 
         int columnStatusIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
@@ -103,82 +100,87 @@ public class Downloader {
         int REASON = cursor.getInt(columnReasonIndex);
         int filenameIndex = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI);
         String filename = cursor.getString(filenameIndex);
+        String bytesDownloaded = cursor
+                .getString(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+        String bytesToDownload = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
 
         String statusText = "";
         String reasonText = "";
 
         switch (STATUS) {
-            case DownloadManager.STATUS_FAILED:
-                statusText = "STATUS_FAILED";
-                switch (REASON) {
-                    case DownloadManager.ERROR_CANNOT_RESUME:
-                        reasonText = "ERROR_CANNOT_RESUME";
-                        break;
-                    case DownloadManager.ERROR_DEVICE_NOT_FOUND:
-                        reasonText = "ERROR_DEVICE_NOT_FOUND";
-                        break;
-                    case DownloadManager.ERROR_FILE_ALREADY_EXISTS:
-                        reasonText = "ERROR_FILE_ALREADY_EXISTS";
-                        break;
-                    case DownloadManager.ERROR_FILE_ERROR:
-                        reasonText = "ERROR_FILE_ERROR";
-                        break;
-                    case DownloadManager.ERROR_HTTP_DATA_ERROR:
-                        reasonText = "ERROR_HTTP_DATA_ERROR";
-                        break;
-                    case DownloadManager.ERROR_INSUFFICIENT_SPACE:
-                        reasonText = "ERROR_INSUFFICIENT_SPACE";
-                        break;
-                    case DownloadManager.ERROR_TOO_MANY_REDIRECTS:
-                        reasonText = "ERROR_TOO_MANY_REDIRECTS";
-                        break;
-                    case DownloadManager.ERROR_UNHANDLED_HTTP_CODE:
-                        reasonText = "ERROR_UNHANDLED_HTTP_CODE";
-                        break;
-                    default:
-                        reasonText = "ERROR_UNKNOWN";
-                        break;
-                }
+        case DownloadManager.STATUS_FAILED:
+            statusText = "STATUS_FAILED";
+            switch (REASON) {
+            case DownloadManager.ERROR_CANNOT_RESUME:
+                reasonText = "ERROR_CANNOT_RESUME";
                 break;
-            case DownloadManager.STATUS_PAUSED:
-                statusText = "STATUS_PAUSED";
-                switch (REASON) {
-                    case DownloadManager.PAUSED_QUEUED_FOR_WIFI:
-                        reasonText = "PAUSED_QUEUED_FOR_WIFI";
-                        break;
-                    case DownloadManager.PAUSED_UNKNOWN:
-                        reasonText = "PAUSED_UNKNOWN";
-                        break;
-                    case DownloadManager.PAUSED_WAITING_FOR_NETWORK:
-                        reasonText = "PAUSED_WAITING_FOR_NETWORK";
-                        break;
-                    case DownloadManager.PAUSED_WAITING_TO_RETRY:
-                        reasonText = "PAUSED_WAITING_TO_RETRY";
-                        break;
-                    default:
-                        reasonText = "UNKNOWN";
-                }
+            case DownloadManager.ERROR_DEVICE_NOT_FOUND:
+                reasonText = "ERROR_DEVICE_NOT_FOUND";
                 break;
-            case DownloadManager.STATUS_PENDING:
-                statusText = "STATUS_PENDING";
+            case DownloadManager.ERROR_FILE_ALREADY_EXISTS:
+                reasonText = "ERROR_FILE_ALREADY_EXISTS";
                 break;
-            case DownloadManager.STATUS_RUNNING:
-                statusText = "STATUS_RUNNING";
+            case DownloadManager.ERROR_FILE_ERROR:
+                reasonText = "ERROR_FILE_ERROR";
                 break;
-            case DownloadManager.STATUS_SUCCESSFUL:
-                statusText = "STATUS_SUCCESSFUL";
-                reasonText = filename;
+            case DownloadManager.ERROR_HTTP_DATA_ERROR:
+                reasonText = "ERROR_HTTP_DATA_ERROR";
+                break;
+            case DownloadManager.ERROR_INSUFFICIENT_SPACE:
+                reasonText = "ERROR_INSUFFICIENT_SPACE";
+                break;
+            case DownloadManager.ERROR_TOO_MANY_REDIRECTS:
+                reasonText = "ERROR_TOO_MANY_REDIRECTS";
+                break;
+            case DownloadManager.ERROR_UNHANDLED_HTTP_CODE:
+                reasonText = "ERROR_UNHANDLED_HTTP_CODE";
                 break;
             default:
-                statusText = "STATUS_UNKNOWN";
-                reasonText = String.valueOf(STATUS);
+                reasonText = "ERROR_UNKNOWN";
                 break;
+            }
+            break;
+        case DownloadManager.STATUS_PAUSED:
+            statusText = "STATUS_PAUSED";
+            switch (REASON) {
+            case DownloadManager.PAUSED_QUEUED_FOR_WIFI:
+                reasonText = "PAUSED_QUEUED_FOR_WIFI";
+                break;
+            case DownloadManager.PAUSED_UNKNOWN:
+                reasonText = "PAUSED_UNKNOWN";
+                break;
+            case DownloadManager.PAUSED_WAITING_FOR_NETWORK:
+                reasonText = "PAUSED_WAITING_FOR_NETWORK";
+                break;
+            case DownloadManager.PAUSED_WAITING_TO_RETRY:
+                reasonText = "PAUSED_WAITING_TO_RETRY";
+                break;
+            default:
+                reasonText = "UNKNOWN";
+            }
+            break;
+        case DownloadManager.STATUS_PENDING:
+            statusText = "STATUS_PENDING";
+            break;
+        case DownloadManager.STATUS_RUNNING:
+            statusText = "STATUS_RUNNING";
+            break;
+        case DownloadManager.STATUS_SUCCESSFUL:
+            statusText = "STATUS_SUCCESSFUL";
+            reasonText = filename;
+            break;
+        default:
+            statusText = "STATUS_UNKNOWN";
+            reasonText = String.valueOf(STATUS);
+            break;
         }
 
         HashMap<String, String> result = new HashMap<>();
         result.put("status", statusText);
         result.put("reason", reasonText);
         result.put("downloadId", String.valueOf(downloadId));
+        result.put("bytesDownloaded", bytesDownloaded);
+        result.put("bytesToDownload", bytesToDownload);
         return result;
     }
 }
