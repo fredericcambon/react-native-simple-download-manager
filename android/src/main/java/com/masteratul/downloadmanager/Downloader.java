@@ -60,7 +60,7 @@ public class Downloader {
         request.setAllowedOverMetered(allowedInMetered);
         request.setVisibleInDownloadsUi(showInDownloads);
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE | DownloadManager.Request.NETWORK_WIFI);
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
         return request;
     }
 
